@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { OAuthErrorEvent, OAuthService } from 'angular-oauth2-oidc';
+import { OAuthErrorEvent, OAuthService, AuthConfig } from 'angular-oauth2-oidc';
 import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
@@ -35,6 +35,7 @@ export class AuthService {
 
   constructor (
     private oauthService: OAuthService,
+    private config: AuthConfig,
     private router: Router,
   ) {
     // Useful for debugging:
@@ -79,6 +80,11 @@ export class AuthService {
     this.oauthService.setupAutomaticSilentRefresh();
   }
 
+  private loadWithoutDiscoveryDocument(): Promise<void> {
+    this.oauthService.configure(this.config);
+    return Promise.resolve();
+  }
+
   public runInitialLoginSequence(): Promise<void> {
     if (location.hash) {
       console.log('Encountered hash fragment, plotting as table...');
@@ -86,9 +92,9 @@ export class AuthService {
     }
 
     // 0. LOAD CONFIG:
-    // First we have to check to see how the IdServer is
+    // First we have to tell the service to see how the IdServer is
     // currently configured:
-    return this.oauthService.loadDiscoveryDocument()
+    return this.loadWithoutDiscoveryDocument()
 
       // For demo purposes, we pretend the previous call was very slow
       .then(() => new Promise(resolve => setTimeout(() => resolve(), 1000)))
