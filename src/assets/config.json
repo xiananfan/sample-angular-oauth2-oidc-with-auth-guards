@@ -1,0 +1,8 @@
+{
+    "environment": "dev",
+    "production": false,
+    "auth": {
+      "authClientId": "implicit",
+      "authDomain": "https://demo.identityserver.io"
+    }
+  }
