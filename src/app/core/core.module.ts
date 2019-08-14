@@ -1,9 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ModuleWithProviders, NgModule, Optional, SkipSelf, APP_INITIALIZER } from '@angular/core';
-import { AuthConfig, JwksValidationHandler, OAuthModule, OAuthModuleConfig, OAuthStorage, ValidationHandler } from 'angular-oauth2-oidc';
+import { APP_INITIALIZER, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { JwksValidationHandler, OAuthModule, OAuthModuleConfig, OAuthStorage, ValidationHandler } from 'angular-oauth2-oidc';
 
 import { AppConfigService } from './app-config.service';
-import { authConfigFactory } from './auth-config';
 import { AuthGuardWithForcedLogin } from './auth-guard-with-forced-login.service';
 import { AuthGuard } from './auth-guard.service';
 import { authModuleConfig } from './auth-module-config';
@@ -36,12 +35,11 @@ export class CoreModule {
     return {
       ngModule: CoreModule,
       providers: [
-        { provide: AuthConfig, useFactory: authConfigFactory, deps: [AppConfigService] },
+        { provide: APP_INITIALIZER, useFactory: appConfigInitializer, multi: true, deps: [AppConfigService] },
         { provide: OAuthModuleConfig, useValue: authModuleConfig },
         { provide: ValidationHandler, useClass: JwksValidationHandler },
         { provide: OAuthStorage, useFactory: storageFactory },
-        AppConfigService,
-        { provide: APP_INITIALIZER, useFactory: appConfigInitializer, multi: true, deps: [AppConfigService] }
+        AppConfigService
       ]
     };
   }

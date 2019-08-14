@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { OAuthErrorEvent, OAuthService } from 'angular-oauth2-oidc';
+import { AuthConfig, OAuthErrorEvent, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { AppConfigService } from './app-config.service';
+import { authConfigFactory } from './auth-config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -35,6 +37,7 @@ export class AuthService {
 
   constructor (
     private oauthService: OAuthService,
+    private appConfigService: AppConfigService,
     private router: Router,
   ) {
     // Useful for debugging:
@@ -80,6 +83,9 @@ export class AuthService {
   }
 
   public runInitialLoginSequence(): Promise<void> {
+    const authConfig: AuthConfig = authConfigFactory(this.appConfigService);
+    this.oauthService.configure(authConfig);
+
     if (location.hash) {
       console.log('Encountered hash fragment, plotting as table...');
       console.table(location.hash.substr(1).split('&').map(kvp => kvp.split('=')));
